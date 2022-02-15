@@ -1,0 +1,9 @@
+fastapi==0.71.0
+uvicorn==0.15.0
+requests==2.27.1
+python-dotenv==0.19.2
+psycopg2-binary
+pymongo==4.0.1
+peewee==3.14.8
+jose==1.0.0
+passlib==1.7.4
