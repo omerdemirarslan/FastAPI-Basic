@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  fastapi_basic:
+    container_name: fastapi_basic
+    build:
+      context: .
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    ports:
+      - "5555:5555"
