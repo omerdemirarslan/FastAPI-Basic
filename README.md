@@ -21,6 +21,20 @@ For the project to up; Docker application must be installed and running in your 
     https://github.com/omerdemirarslan/FastAPI-Basic.git
 
 ### Run The Project:
+    
+    -> Docker command:
+        docker-compose up --build
 
-    docker-compose build
-    docker-compose up
+        docker-compose build
+        docker-compose up
+
+    -> Make command:
+        make up-build
+        make up
+        make down
+        make build
+        make run
+        make logs
+    
+
+    
