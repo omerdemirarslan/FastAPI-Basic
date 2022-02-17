@@ -23,3 +23,9 @@ class Users(peewee.Model):
     class Meta:
         table_name = "users"
         database = DATABASE
+
+    @classmethod
+    def update(cls, *args, **kwargs):
+        kwargs['updated_date'] = datetime.now()
+
+        return super(Users, cls).save(*args, **kwargs)
