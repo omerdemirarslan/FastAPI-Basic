@@ -1,3 +1,4 @@
+import logging
 import peewee
 
 from datetime import datetime
@@ -5,6 +6,8 @@ from datetime import datetime
 from models.postgresql.database_connection import postgresql_database_connection
 
 DATABASE = postgresql_database_connection()
+
+logger = logging.getLogger(__name__)
 
 
 class Users(peewee.Model):
@@ -26,6 +29,30 @@ class Users(peewee.Model):
 
     @classmethod
     def update(cls, *args, **kwargs):
+        """
+
+        :param args:
+        :param kwargs:
+        :return:
+        """
         kwargs['updated_date'] = datetime.now()
 
         return super(Users, cls).save(*args, **kwargs)
+
+    @classmethod
+    def get_as_dict(cls, **expr) -> dict:
+        """
+        This Method Return User Info Data If User Exist or Return Empty Dict
+        :param expr: Expression
+        :return: dict
+        """
+        try:
+            query = Users.select().where(*[getattr(Users, key) == value for key, value in expr.items()]).dicts()
+
+            return query.get()
+        except peewee.DoesNotExist:
+            message = "User does not exist"
+
+            logger.warning(msg=message)
+
+            return {}
