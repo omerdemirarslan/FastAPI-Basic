@@ -1,30 +1,31 @@
 import logging
+import peewee
 
 from datetime import datetime
 
 from models.postgresql.database_connection import postgresql_database_connection
-
-from sqlalchemy import Column, Integer, VARCHAR, Text, SmallInteger, Date, DateTime, Boolean
 
 DATABASE = postgresql_database_connection()
 
 logger = logging.getLogger(__name__)
 
 
-class Users(DATABASE):
-    __tablename__ = "users"
+class Users(peewee.Model):
+    id = peewee.AutoField(primary_key=True)
+    name = peewee.CharField(max_length=50)
+    surname = peewee.CharField(max_length=50)
+    email = peewee.CharField(max_length=80)
+    password = peewee.CharField(null=False)
+    gender = peewee.SmallIntegerField(null=True)
+    birthday = peewee.DateField(null=True)
+    created_date = peewee.DateTimeField(default=datetime.now())
+    updated_date = peewee.DateTimeField()
+    status = peewee.SmallIntegerField()
+    test_user = peewee.BooleanField(default=False)
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(VARCHAR)
-    surname = Column(VARCHAR)
-    email = Column(VARCHAR)
-    password = Column(Text, nullable=True)
-    gender = Column(SmallInteger, nullable=True)
-    birthday = Column(Date, nullable=True)
-    created_date = Column(DateTime, default=datetime.now())
-    updated_date = Column(DateTime)
-    status = Column(SmallInteger)
-    test_user = Column(Boolean, default=False)
+    class Meta:
+        table_name = "users"
+        database = DATABASE
 
     @classmethod
     def update(cls, *args, **kwargs):
@@ -54,7 +55,9 @@ class Users(DATABASE):
 
             return user
         except Exception as err:
-            logger.warning(msg=err)
+            message = err
+
+            logger.warning(msg=message)
 
             return {}
 
@@ -69,8 +72,7 @@ class Users(DATABASE):
             query = Users.select().where(*[getattr(Users, key) == value for key, value in expr.items()]).dicts()
 
             return query.get()
-        except Exception as err:
-            print(err)
+        except peewee.DoesNotExist:
             message = "User does not exist"
 
             logger.warning(msg=message)
