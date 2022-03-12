@@ -1,36 +1,35 @@
 import logging
-import peewee
 
 from datetime import datetime
 
 from models.postgresql.database_connection import postgresql_database_connection
+
+from sqlalchemy import Column, Integer, VARCHAR, Text, SmallInteger, Date, DateTime, Boolean
 
 DATABASE = postgresql_database_connection()
 
 logger = logging.getLogger(__name__)
 
 
-class Users(peewee.Model):
-    id = peewee.AutoField(primary_key=True)
-    name = peewee.CharField(max_length=50)
-    surname = peewee.CharField(max_length=50)
-    email = peewee.CharField(max_length=80)
-    password = peewee.TextField()
-    gender = peewee.SmallIntegerField()
-    birthday = peewee.DateField()
-    created_date = peewee.DateTimeField(default=datetime.now())
-    updated_date = peewee.DateTimeField()
-    status = peewee.SmallIntegerField()
-    test_user = peewee.BooleanField(default=False)
+class Users(DATABASE):
+    __tablename__ = "users"
 
-    class Meta:
-        table_name = "users"
-        database = DATABASE
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(VARCHAR)
+    surname = Column(VARCHAR)
+    email = Column(VARCHAR)
+    password = Column(Text, nullable=True)
+    gender = Column(SmallInteger, nullable=True)
+    birthday = Column(Date, nullable=True)
+    created_date = Column(DateTime, default=datetime.now())
+    updated_date = Column(DateTime)
+    status = Column(SmallInteger)
+    test_user = Column(Boolean, default=False)
 
     @classmethod
     def update(cls, *args, **kwargs):
         """
-
+        This Method Update updated_date When Get Option User Model
         :param args:
         :param kwargs:
         :return:
@@ -38,6 +37,26 @@ class Users(peewee.Model):
         kwargs['updated_date'] = datetime.now()
 
         return super(Users, cls).save(*args, **kwargs)
+
+    @classmethod
+    def user_create(cls, user_data: dict) -> dict:
+        """
+        This Method Return User Info Data If User Exist or Return Empty Dict
+        :param user_data: Expression
+        :return: dict
+        """
+        try:
+            user = Users.create(
+                name=user_data["name"],
+                surname=user_data["surname"],
+                email=user_data["email"]
+            )
+
+            return user
+        except Exception as err:
+            logger.warning(msg=err)
+
+            return {}
 
     @classmethod
     def get_as_dict(cls, **expr) -> dict:
@@ -50,7 +69,8 @@ class Users(peewee.Model):
             query = Users.select().where(*[getattr(Users, key) == value for key, value in expr.items()]).dicts()
 
             return query.get()
-        except peewee.DoesNotExist:
+        except Exception as err:
+            print(err)
             message = "User does not exist"
 
             logger.warning(msg=message)
