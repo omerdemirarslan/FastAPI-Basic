@@ -10,38 +10,32 @@ logger = logging.getLogger(__name__)
 class UserBaseHelper:
     """ User Base Helper Class """
 
-    @classmethod
-    def get_or_create(cls, user_data: dict) -> dict:
+    def __init__(self):
+        self.user_auth = {"authentication": True}
+        self.response_status = {"status": status.HTTP_200_OK}
+
+    def get_or_create(self, user_data) -> dict:
         """
         This Method Get User or User Create and Return User Info Data
-        :param user_data:
         :return: dict
         """
-        user_email = user_data["email"]
-        user_auth = {"authentication": True}
-        response_status = {"status": status.HTTP_200_OK}
-
-        user_info = Users.get_as_dict(email=user_email)
+        user_info = Users.get_as_dict(email=user_data["email"])
 
         if not user_info:
-
             try:
-                user = Users.create(
-                    name=user_data["name"],
-                    surname=user_data["surname"],
-                    email=user_email
-                )
+                user = Users.user_create(user_data=user_data)
 
-                response_status["status"] = status.HTTP_201_CREATED
+                self.response_status["status"] = status.HTTP_201_CREATED
+
                 user_info = Users.get_as_dict(id=user)
             except Exception as e:
                 logger.warning(msg=e)
 
-                user_auth["authentication"] = False
-                response_status["status"] = status.HTTP_401_UNAUTHORIZED
+                self.user_auth["authentication"] = False
+                self.response_status["status"] = status.HTTP_401_UNAUTHORIZED
 
         user_detail = {
-            "status": response_status,
+            "status": self.response_status,
             "data": {
                 "user": {
                             "id": user_info["id"],
@@ -52,20 +46,18 @@ class UserBaseHelper:
                             "birthday": user_info["birthday"],
                             "status": user_info["status"],
                             "test_user": user_info["test_user"]
-                        } | user_auth
+                        } | self.user_auth
             }
         }
 
         return user_detail
 
-    @classmethod
-    def authentication(cls, user_data: dict) -> dict:
+    def authentication(self, user_data: dict) -> dict:
         """
         This Method Return User Data With Authentication Information
-        :param user_data:
         :return: dict
         """
-        user_detail = cls.get_or_create(
+        user_detail = self.get_or_create(
             user_data=user_data
         )
 

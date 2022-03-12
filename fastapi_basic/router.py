@@ -5,7 +5,7 @@ from utility.helper.users import UserBaseHelper
 
 
 @app.post("/api/v1/users/register", tags=["user Register"])
-def user_register(user_post_data: Request):
+async def user_register(user_post_data: Request):
     """
     This Method Handle User Register Requests
     :param user_post_data:
@@ -13,9 +13,10 @@ def user_register(user_post_data: Request):
     """
     user_converted_data = await user_post_data.json()
 
-    user_info_data = UserBaseHelper.authentication(user_data=user_converted_data)
+    new_user_data = UserBaseHelper()
+    new_user_data.authentication(user_data=user_converted_data)
 
-    return user_info_data
+    return new_user_data
 
 
 @app.patch("/api/v1/users/update", tags=["user Update"])
@@ -25,7 +26,7 @@ def user_update(user_post_data: Request):
     :param user_post_data:
     :return:
     """
-    user_converted_data = await user_post_data.json()
+    user_converted_data = user_post_data.json()
 
     return user_converted_data
 
@@ -37,6 +38,6 @@ def user_update(user_post_data: Request):
     :param user_post_data:
     :return:
     """
-    user_converted_data = await user_post_data.json()
+    user_converted_data = user_post_data.json()
 
     return user_converted_data

@@ -3,4 +3,5 @@ uvicorn==0.15.0
 requests==2.27.1
 python-dotenv==0.19.2
 psycopg2-binary
-peewee==3.14.8
+sqlalchemy==1.4.32
+
