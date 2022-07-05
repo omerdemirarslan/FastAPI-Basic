@@ -1,27 +1,29 @@
 import logging
-import peewee
 
 from datetime import datetime
 
-from models.postgresql.database_connection import postgresql_database_connection
+from peewee import AutoField, CharField, SmallIntegerField, DateField, DateTimeField, BooleanField, DoesNotExist
 
-DATABASE = postgresql_database_connection()
+from apps.base.database_management import DatabaseManagement
+from apps.base.models import BaseModel
+
+DATABASE = DatabaseManagement()
 
 logger = logging.getLogger(__name__)
 
 
-class Users(peewee.Model):
-    id = peewee.AutoField(primary_key=True)
-    name = peewee.CharField(max_length=50)
-    surname = peewee.CharField(max_length=50)
-    email = peewee.CharField(max_length=80)
-    password = peewee.CharField(null=False)
-    gender = peewee.SmallIntegerField(null=True)
-    birthday = peewee.DateField(null=True)
-    created_date = peewee.DateTimeField(default=datetime.now())
-    updated_date = peewee.DateTimeField()
-    status = peewee.SmallIntegerField()
-    test_user = peewee.BooleanField(default=False)
+class Users(BaseModel):
+    id = AutoField(primary_key=True)
+    name = CharField(max_length=50)
+    surname = CharField(max_length=50)
+    email = CharField(max_length=80)
+    password = CharField(null=False)
+    gender = SmallIntegerField(null=True)
+    birthday = DateField(null=True)
+    created_date = DateTimeField(default=datetime.now())
+    updated_date = DateTimeField()
+    status = SmallIntegerField()
+    test_user = BooleanField(default=False)
 
     class Meta:
         table_name = "users"
@@ -72,7 +74,7 @@ class Users(peewee.Model):
             query = Users.select().where(*[getattr(Users, key) == value for key, value in expr.items()]).dicts()
 
             return query.get()
-        except peewee.DoesNotExist:
+        except DoesNotExist:
             message = "User does not exist"
 
             logger.warning(msg=message)

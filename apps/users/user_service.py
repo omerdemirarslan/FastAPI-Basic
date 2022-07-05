@@ -2,12 +2,12 @@
 import logging
 
 from fastapi_basic import status
-from models.postgresql.models import Users
+from models import Users
 
 logger = logging.getLogger(__name__)
 
 
-class UserBaseHelper:
+class UserService:
     """ User Base Helper Class """
 
     def __init__(self):
