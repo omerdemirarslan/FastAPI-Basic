@@ -1,7 +1,7 @@
 from fastapi_basic import app, Request
 
 
-from utility.helper.users import UserBaseHelper
+from apps.users.user_service import UserService
 
 
 @app.post("/api/v1/users/register", tags=["user Register"])
@@ -13,7 +13,7 @@ async def user_register(user_post_data: Request):
     """
     user_converted_data = await user_post_data.json()
 
-    new_user_data = UserBaseHelper()
+    new_user_data = UserService()
     new_user_data.authentication(user_data=user_converted_data)
 
     return new_user_data

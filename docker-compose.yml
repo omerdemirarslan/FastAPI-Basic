@@ -1,12 +1,21 @@
 version: '3.9'
 
+volumes:
+  flight_tracking_app_local_postgres_data: {}
+
 services:
-  db:
-    image: postgres
-    environment:
-      - POSTGRES_DB=fastapi-basic
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=090816
+  postgres:
+    build:
+      context: .
+      dockerfile: ./postgresql/Dockerfile
+    image: flight_tracking_app_production_postgres
+    container_name: flight_tracking_app_local_postgres
+    volumes:
+      - flight_tracking_app_local_postgres_data:/var/lib/postgresql/data:Z
+    env_file:
+      - .env
+    ports:
+      - "6432:5432"
   fastapi_basic:
     container_name: fastapi_basic
     build:
