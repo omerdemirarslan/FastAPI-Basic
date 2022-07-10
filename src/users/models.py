@@ -1,11 +1,11 @@
 import logging
 
-from datetime import datetime
+import datetime
 
 from peewee import AutoField, CharField, SmallIntegerField, DateField, DateTimeField, BooleanField, DoesNotExist
 
-from apps.base.database_management import DatabaseManagement
-from apps.base.models import BaseModel
+from src.base.database_management import DatabaseManagement
+from src.base.models import BaseModel
 
 DATABASE = DatabaseManagement()
 
@@ -20,7 +20,6 @@ class Users(BaseModel):
     password = CharField(null=False)
     gender = SmallIntegerField(null=True)
     birthday = DateField(null=True)
-    created_date = DateTimeField(default=datetime.now())
     updated_date = DateTimeField()
     status = SmallIntegerField()
     test_user = BooleanField(default=False)
@@ -37,7 +36,7 @@ class Users(BaseModel):
         :param kwargs:
         :return:
         """
-        kwargs['updated_date'] = datetime.now()
+        kwargs['updated_date'] = datetime.datetime.now()
 
         return super(Users, cls).save(*args, **kwargs)
 

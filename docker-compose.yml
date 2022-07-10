@@ -1,23 +1,11 @@
 version: '3.9'
 
 volumes:
-  flight_tracking_app_local_postgres_data: {}
+  fastapi-basic-local-postgres: {}
 
 services:
-  postgres:
-    build:
-      context: .
-      dockerfile: ./postgresql/Dockerfile
-    image: flight_tracking_app_production_postgres
-    container_name: flight_tracking_app_local_postgres
-    volumes:
-      - flight_tracking_app_local_postgres_data:/var/lib/postgresql/data:Z
-    env_file:
-      - .env
-    ports:
-      - "6432:5432"
-  fastapi_basic:
-    container_name: fastapi_basic
+  fastapi-basic:
+    container_name: fastapi-basic
     build:
       context: .
     env_file:
@@ -25,6 +13,20 @@ services:
     volumes:
       - .:/app
     ports:
-      - "5555:5555"
+      - "8000:8000"
     depends_on:
-      - db
+      - postgres
+    command: /start-sh
+
+  postgres:
+    build:
+      context: .
+      dockerfile: docker-compose-local/Dockerfile
+    image: fastapi-basic-local-postgres
+    container_name: fastapi-basic-local-postgres
+    volumes:
+      - fastapi-basic-local-postgres:/var/lib/postgresql/data:Z
+    env_file:
+      - .env
+    ports:
+      - "6432:5432"
