@@ -1,7 +1,16 @@
-from fastapi_basic import app, Request
+from src.fastapi_basic import app, Request
 
 
-from apps.users.user_service import UserService
+from src.users.user_service import UserService
+
+
+@app.get("/")
+async def home():
+    """
+    This Method Get Home Page
+    """
+    return {"message": "Hello World"}
+
 
 
 @app.post("/api/v1/users/register", tags=["user Register"])

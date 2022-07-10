@@ -1,18 +1,28 @@
 """ This File Contains FastAPI Basic Database Management Process """
 import logging
 
-from os import getenv
+from os import getenv, path
 
-from playhouse.migrate import PostgresqlDatabase, PostgresqlMigrator
+from peewee import PostgresqlDatabase
+from peewee_migrate import Router
 
 logger = logging.getLogger(__name__)
 
 
-class DatabaseManagement:
+MIGRATION_FOLDER_PATH = path.abspath(
+    path.join(path.dirname(__file__), "..", "migrations")
+)
 
+
+class DatabaseManagement:
     def __init__(self):
+
         self.database = self.postgresql_database_connection()
-        self.migrator = PostgresqlMigrator(database=self.database)
+        self.router = Router(
+            database=self.database,
+            ignore=["basemodel"],
+            migrate_dir=MIGRATION_FOLDER_PATH
+        )
 
     def __enter__(self):
         """
@@ -31,7 +41,7 @@ class DatabaseManagement:
 
     def postgresql_database_connection(self) -> PostgresqlDatabase:
         """
-        This Function Provide Connection To Platform Integration Postgresql Database.
+        This Function Provide Connection To FastAPI Basic Postgresql Database.
         :return: models connection
         """
         try:
@@ -49,10 +59,10 @@ class DatabaseManagement:
 
     def postgresql_create_tables(self) -> bool:
         """
-        This Method Creates Necessary Postgresql Models For Platform Integration.
+        This Method Creates Necessary Postgresql Models For FastAPI Basic.
         :return:
         """
-        from apps.users.models import Users
+        from src.users.models import Users
 
         try:
             with self.database:
@@ -68,17 +78,15 @@ class DatabaseManagement:
 
     def postgresql_migrate_tables(self) -> bool:
         """
-
+        This Method Creates Necessary Migration Auto For All Models.
         :return:
         """
         try:
             with self.database:
-                pass
-                """migrate(
-                    self.migrator.add_column("account_integration_configs", "test", test)
-                )"""
+                self.router.create(auto=True)
+                self.router.run()
 
-            return True
+                return True
         except Exception as error:
             logger.error(msg=error)
 

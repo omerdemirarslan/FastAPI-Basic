@@ -1,9 +1,14 @@
-import fastapi_basic
-
 import uvicorn
 
+from .fastapi_basic import app
 
 from argparse import ArgumentParser
+from src.base.database_management import DatabaseManagement
+
+
+DATABASE = DatabaseManagement()
+DATABASE.postgresql_create_tables()
+DATABASE.postgresql_migrate_tables()
 
 
 def parse_arguments() -> ArgumentParser:
@@ -39,7 +44,7 @@ def run(args: ArgumentParser):
     uvicorn.run(
         app="fastapi_basic.router:app",
         host="0.0.0.0",
-        port=5555,
+        port=8000,
         reload=args.reload,
         debug=args.debug,
         access_log=args.access_log,

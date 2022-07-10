@@ -1,8 +1,8 @@
 """ User Base Helper File For All Helper Functions """
 import logging
 
-from fastapi_basic import status
-from models import Users
+from src.fastapi_basic import status
+from .models import Users
 
 logger = logging.getLogger(__name__)
 
