@@ -11,8 +11,8 @@ class UserService:
     """ User Base Helper Class """
 
     def __init__(self):
-        self.user_auth = {"authentication": True}
-        self.response_status = {"status": status.HTTP_200_OK}
+        self.user_auth = {"authentication": True, "authentication_token": ""}
+        self.response_status = status.HTTP_200_OK
 
     def get_or_create(self, user_data) -> dict:
         """
@@ -25,14 +25,14 @@ class UserService:
             try:
                 user = Users.user_create(user_data=user_data)
 
-                self.response_status["status"] = status.HTTP_201_CREATED
+                self.response_status = status.HTTP_201_CREATED
 
                 user_info = Users.get_as_dict(id=user)
             except Exception as e:
                 logger.warning(msg=e)
 
                 self.user_auth["authentication"] = False
-                self.response_status["status"] = status.HTTP_401_UNAUTHORIZED
+                self.response_status = status.HTTP_401_UNAUTHORIZED
 
                 user_detail = {
                     "status": self.response_status,
@@ -55,7 +55,7 @@ class UserService:
                 "birthday": user_info["birthday"],
                 "status": user_info["status"],
                 "test_user": user_info["test_user"],
-            } | self.user_auth
+            }
         }
 
         return user_detail
@@ -69,7 +69,9 @@ class UserService:
             user_data=user_data
         )
 
-        if not user_detail["data"]["authentication"]:
-            return user_detail["data"] | {"authentication_token": None}
+        if not self.user_auth["authentication"]:
+            return user_detail | self.user_auth
 
-        return user_detail["data"] | {"authentication_token": "some key"}
+        self.user_auth["authentication_token"] = "some key"
+
+        return user_detail | self.user_auth

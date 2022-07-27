@@ -1,4 +1,4 @@
-from src.fastapi_basic import app, Request
+from src.fastapi_basic import app, Request, responses
 
 
 from src.users.user_service import UserService
@@ -23,9 +23,11 @@ async def user_register(user_post_data: Request):
     user_converted_data = await user_post_data.json()
 
     new_user_data = UserService()
-    new_user_data.authentication(user_data=user_converted_data)
+    user_info = new_user_data.authentication(user_data=user_converted_data)
 
-    return new_user_data
+    return responses.JSONResponse(
+            user_info
+    )
 
 
 @app.patch("/api/v1/users/update", tags=["user Update"])
