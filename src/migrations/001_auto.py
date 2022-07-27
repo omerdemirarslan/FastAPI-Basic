@@ -47,7 +47,7 @@ def migrate(migrator, database, fake=False, **kwargs):
         gender = pw.SmallIntegerField(null=True)
         birthday = pw.DateField(null=True)
         updated_date = pw.DateTimeField()
-        status = pw.SmallIntegerField()
+        status = pw.SmallIntegerField(constraints=[SQL("DEFAULT 1")], default=1)
         test_user = pw.BooleanField(constraints=[SQL("DEFAULT False")], default=False)
 
         class Meta:

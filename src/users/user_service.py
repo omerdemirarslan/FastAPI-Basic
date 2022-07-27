@@ -11,8 +11,8 @@ class UserService:
     """ User Base Helper Class """
 
     def __init__(self):
-        self.user_auth = {"authentication": True}
-        self.response_status = {"status": status.HTTP_200_OK}
+        self.user_auth = {"authentication": True, "authentication_token": ""}
+        self.response_status = status.HTTP_200_OK
 
     def get_or_create(self, user_data) -> dict:
         """
@@ -25,28 +25,36 @@ class UserService:
             try:
                 user = Users.user_create(user_data=user_data)
 
-                self.response_status["status"] = status.HTTP_201_CREATED
+                self.response_status = status.HTTP_201_CREATED
 
                 user_info = Users.get_as_dict(id=user)
             except Exception as e:
                 logger.warning(msg=e)
 
                 self.user_auth["authentication"] = False
-                self.response_status["status"] = status.HTTP_401_UNAUTHORIZED
+                self.response_status = status.HTTP_401_UNAUTHORIZED
+
+                user_detail = {
+                    "status": self.response_status,
+                    "data": {
+                        "There Is No Data."
+                    }
+                }
+
+                return user_detail
+
 
         user_detail = {
             "status": self.response_status,
             "data": {
-                "user": {
-                            "id": user_info["id"],
-                            "name": user_info["name"],
-                            "surname": user_info["surname"],
-                            "email": user_info["email"],
-                            "gender": user_info["gender"],
-                            "birthday": user_info["birthday"],
-                            "status": user_info["status"],
-                            "test_user": user_info["test_user"]
-                        } | self.user_auth
+                "id": user_info["id"],
+                "name": user_info["name"],
+                "surname": user_info["surname"],
+                "email": user_info["email"],
+                "gender": user_info["gender"],
+                "birthday": user_info["birthday"],
+                "status": user_info["status"],
+                "test_user": user_info["test_user"],
             }
         }
 
@@ -61,6 +69,9 @@ class UserService:
             user_data=user_data
         )
 
-        if not user_detail["authentication"]:
-            return user_detail | {"authentication_token": None}
-        return user_detail | {"authentication_token": "some key"}
+        if not self.user_auth["authentication"]:
+            return user_detail | self.user_auth
+
+        self.user_auth["authentication_token"] = "some key"
+
+        return user_detail | self.user_auth

@@ -20,25 +20,24 @@ class Users(BaseModel):
     password = CharField(null=False)
     gender = SmallIntegerField(null=True)
     birthday = DateField(null=True)
-    updated_date = DateTimeField()
-    status = SmallIntegerField()
+    updated_date = DateTimeField(null=False, default=datetime.datetime.now)
+    status = SmallIntegerField(default=1)
     test_user = BooleanField(default=False)
 
     class Meta:
         table_name = "users"
-        database = DATABASE
 
     @classmethod
-    def update(cls, *args, **kwargs):
+    def update(cls, __data=None, **update):
         """
         This Method Update updated_date When Get Option User Model
-        :param args:
-        :param kwargs:
+        :param __data:
+        :param update:
         :return:
         """
-        kwargs['updated_date'] = datetime.datetime.now()
+        update['updated_date'] = datetime.datetime.now()
 
-        return super(Users, cls).save(*args, **kwargs)
+        return super(Users, cls).update(__data, **update)
 
     @classmethod
     def user_create(cls, user_data: dict) -> dict:
@@ -51,11 +50,13 @@ class Users(BaseModel):
             user = Users.create(
                 name=user_data["name"],
                 surname=user_data["surname"],
-                email=user_data["email"]
+                email=user_data["email"],
+                password=user_data["password"]
             )
 
             return user
         except Exception as err:
+            print(err, "----------------------")
             message = err
 
             logger.warning(msg=message)

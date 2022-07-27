@@ -13,7 +13,7 @@ COPY . /app
 
 WORKDIR /app
 
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /app/src/requirements.txt
 
 COPY entrypoint.sh /entrypoint-sh
 

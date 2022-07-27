@@ -15,8 +15,8 @@ MIGRATION_FOLDER_PATH = path.abspath(
 
 
 class DatabaseManagement:
-    def __init__(self):
 
+    def __init__(self):
         self.database = self.postgresql_database_connection()
         self.router = Router(
             database=self.database,
@@ -91,3 +91,16 @@ class DatabaseManagement:
             logger.error(msg=error)
 
             return False
+
+    """def postgresql_model_execute(self, query):
+        try:
+            with self.database:
+                self.database.execute(
+                    query=query,
+                )
+
+                return True
+        except Exception as error:
+            logger.error(msg=error)
+
+            return False"""
