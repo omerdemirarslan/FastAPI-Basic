@@ -14,3 +14,4 @@ class BaseModel(Model):
 
     class Meta:
         database = database_object.postgresql_database_connection()
+        table_name = "basemodel"

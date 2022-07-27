@@ -34,20 +34,28 @@ class UserService:
                 self.user_auth["authentication"] = False
                 self.response_status["status"] = status.HTTP_401_UNAUTHORIZED
 
+                user_detail = {
+                    "status": self.response_status,
+                    "data": {
+                        "There Is No Data."
+                    }
+                }
+
+                return user_detail
+
+
         user_detail = {
             "status": self.response_status,
             "data": {
-                "user": {
-                            "id": user_info["id"],
-                            "name": user_info["name"],
-                            "surname": user_info["surname"],
-                            "email": user_info["email"],
-                            "gender": user_info["gender"],
-                            "birthday": user_info["birthday"],
-                            "status": user_info["status"],
-                            "test_user": user_info["test_user"]
-                        } | self.user_auth
-            }
+                "id": user_info["id"],
+                "name": user_info["name"],
+                "surname": user_info["surname"],
+                "email": user_info["email"],
+                "gender": user_info["gender"],
+                "birthday": user_info["birthday"],
+                "status": user_info["status"],
+                "test_user": user_info["test_user"],
+            } | self.user_auth
         }
 
         return user_detail
@@ -61,6 +69,7 @@ class UserService:
             user_data=user_data
         )
 
-        if not user_detail["authentication"]:
-            return user_detail | {"authentication_token": None}
-        return user_detail | {"authentication_token": "some key"}
+        if not user_detail["data"]["authentication"]:
+            return user_detail["data"] | {"authentication_token": None}
+
+        return user_detail["data"] | {"authentication_token": "some key"}
