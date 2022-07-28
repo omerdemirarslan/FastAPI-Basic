@@ -56,7 +56,6 @@ class Users(BaseModel):
 
             return user
         except Exception as err:
-            print(err, "----------------------")
             message = err
 
             logger.warning(msg=message)
