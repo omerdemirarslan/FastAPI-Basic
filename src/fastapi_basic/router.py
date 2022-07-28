@@ -1,7 +1,11 @@
-from src.fastapi_basic import app, Request, responses
+import logging
 
+from src.fastapi_basic import app, Request, responses, status
 
 from src.users.user_service import UserService
+
+
+logger = logging.getLogger(__name__)
 
 
 @app.get("/")
@@ -20,14 +24,43 @@ async def user_register(user_post_data: Request):
     :param user_post_data:
     :return:
     """
-    user_converted_data = await user_post_data.json()
+    try:
+        user_converted_data = await user_post_data.json()
+    except Exception as error:
+        logger.error(error)
 
-    new_user_data = UserService()
-    user_info = new_user_data.authentication(user_data=user_converted_data)
+        return responses.JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "message": "Sent Data Type Must Be JSON"
+            }
 
-    return responses.JSONResponse(
-            user_info
-    )
+        )
+
+    if isinstance(user_converted_data, dict):
+        try:
+            user = UserService()
+            user_info = user.authentication(user_data=user_converted_data)
+
+            return responses.JSONResponse(
+                user_info
+            )
+        except Exception as error:
+            logger.error(error)
+
+            return responses.JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "message": "There Is An Error."
+                }
+            )
+    else:
+        return responses.JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "message": "Sent Data Type Must Be JSON"
+            }
+        )
 
 
 @app.patch("/api/v1/users/update", tags=["user Update"])
