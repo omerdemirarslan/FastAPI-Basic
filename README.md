@@ -101,7 +101,7 @@ $ source fastapi-basic/bin/activate
 $ pip install -r src/requirements.txt
 ```
 
-#### Run project with guvicorn
+#### Run project with uvicorn
 ```shell
 $ uvicorn src.main:app --host 0.0.0.0 --reload
 ```
