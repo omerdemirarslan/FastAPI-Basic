@@ -1,0 +1,12 @@
+[flake8]
+ignore =
+max-line-length = 120
+exclude =
+    # No need to traverse our git directory
+    .git,
+    # There's no value in checking cache directories
+    __pycache__,
+    # This file contains our built documentation
+    README,
+strictness = long
+import-order-style = pycharm

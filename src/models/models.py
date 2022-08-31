@@ -65,10 +65,8 @@ class Users(BaseModel):
             )
 
             return user
-        except Exception as err:
-            message = err
-
-            LOGGER.warning(msg=message)
+        except Exception as error:
+            LOGGER.warning(msg=str(error))
 
             return {}
 
@@ -79,13 +77,33 @@ class Users(BaseModel):
         :param expr: Expression
         :return: dict
         """
-        try:
-            query = Users.select().where(*[getattr(Users, key) == value for key, value in expr.items()]).dicts()
+        result = {"data": None}
 
-            return query.get()
+        try:
+            query = Users.select(
+                Users.id,
+                Users.name,
+                Users.surname,
+                Users.email,
+                Users.gender,
+                Users.birthday,
+                Users.status,
+                Users.test_user
+            ).where(
+                *[getattr(Users, key) == value for key, value in expr.items()]
+            ).dicts()
+
+            result.update(
+                data=query.get()
+            )
+            return result
         except DoesNotExist:
             message = "User Does Not Exist"
 
             LOGGER.warning(msg=message)
 
-            return {}
+            return result
+        except Exception as error:
+            LOGGER.warning(msg=str(error))
+
+            return result
