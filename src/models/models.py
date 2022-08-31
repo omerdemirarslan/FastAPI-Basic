@@ -1,26 +1,36 @@
+""" This File Contains Base Models For All Project """
 import logging
 
 import datetime
 
-from peewee import AutoField, CharField, SmallIntegerField, DateField, DateTimeField, BooleanField, DoesNotExist
+from peewee import (
+    Model, AutoField, DateTimeField, CharField, SmallIntegerField, DateField, BooleanField, DoesNotExist
+)
 
 from src.base.database_management import DatabaseManagement
-from src.base.models import BaseModel
 
-DATABASE = DatabaseManagement()
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
+DATABASE_OBJECT = DatabaseManagement()
+
+
+class BaseModel(Model):
+    id = AutoField(primary_key=True)
+    created_at = DateTimeField(null=False, default=datetime.datetime.now)
+    updated_date = DateTimeField(null=False, default=datetime.datetime.now)
+
+    class Meta:
+        database = DATABASE_OBJECT.postgresql_database_connection()
+        table_name = "basemodel"
 
 
 class Users(BaseModel):
-    id = AutoField(primary_key=True)
     name = CharField(max_length=50)
     surname = CharField(max_length=50)
     email = CharField(max_length=80)
     password = CharField(null=False)
     gender = SmallIntegerField(null=True)
     birthday = DateField(null=True)
-    updated_date = DateTimeField(null=False, default=datetime.datetime.now)
     status = SmallIntegerField(default=1)
     test_user = BooleanField(default=False)
 
@@ -58,7 +68,7 @@ class Users(BaseModel):
         except Exception as err:
             message = err
 
-            logger.warning(msg=message)
+            LOGGER.warning(msg=message)
 
             return {}
 
@@ -74,8 +84,8 @@ class Users(BaseModel):
 
             return query.get()
         except DoesNotExist:
-            message = "User does not exist"
+            message = "User Does Not Exist"
 
-            logger.warning(msg=message)
+            LOGGER.warning(msg=message)
 
             return {}

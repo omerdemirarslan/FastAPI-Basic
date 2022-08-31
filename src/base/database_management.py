@@ -24,22 +24,8 @@ class DatabaseManagement:
             migrate_dir=MIGRATION_FOLDER_PATH
         )
 
-    def __enter__(self):
-        """
-        This Method Provides Database Connection Process Before Requests
-        :return:
-        """
-        self.database.connect()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        This Method Provides Database Connection Close Process After Requests
-        :return:
-        """
-        self.database.close()
-
-
-    def postgresql_database_connection(self) -> PostgresqlDatabase:
+    @classmethod
+    def postgresql_database_connection(cls) -> PostgresqlDatabase:
         """
         This Function Provide Connection To FastAPI Basic Postgresql Database.
         :return: models connection
@@ -59,10 +45,10 @@ class DatabaseManagement:
 
     def postgresql_create_tables(self) -> bool:
         """
-        This Method Creates Necessary Postgresql Models For FastAPI Basic.
+        This Method Creates Necessary Postgresql Models For FastAPI Basic
         :return:
         """
-        from src.users.models import Users
+        from src.models.models import Users
 
         try:
             with self.database:

@@ -16,7 +16,6 @@ async def home():
     return {"message": "Hello World"}
 
 
-
 @app.post("/api/v1/users/register", tags=["user Register"])
 async def user_register(user_post_data: Request):
     """
@@ -40,7 +39,7 @@ async def user_register(user_post_data: Request):
     if isinstance(user_converted_data, dict):
         try:
             user = UserService()
-            user_info = user.authentication(user_data=user_converted_data)
+            user_info = user.user_register(user_data=user_converted_data)
 
             return responses.JSONResponse(
                 user_info
