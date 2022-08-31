@@ -40,13 +40,13 @@ def migrate(migrator, database, fake=False, **kwargs):
     class Users(pw.Model):
         id = pw.AutoField()
         created_at = pw.DateTimeField()
+        updated_date = pw.DateTimeField()
         name = pw.CharField(max_length=50)
         surname = pw.CharField(max_length=50)
         email = pw.CharField(max_length=80)
         password = pw.CharField(max_length=255)
         gender = pw.SmallIntegerField(null=True)
         birthday = pw.DateField(null=True)
-        updated_date = pw.DateTimeField()
         status = pw.SmallIntegerField(constraints=[SQL("DEFAULT 1")], default=1)
         test_user = pw.BooleanField(constraints=[SQL("DEFAULT False")], default=False)
 
