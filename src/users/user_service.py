@@ -13,24 +13,18 @@ class UserService:
     def __init__(self, user_data: dict):
         self.request_data = user_data
         self.user_auth = {"authentication": True, "authentication_token": None}
-        self.response_status = status.HTTP_200_OK
-        self.message = "User Already Exist! User Info Is Here"
 
     def get_user_info_result(self):
         """
-
+        This Method Get User Info. If User Exist Return User All Data, It Is Not Returns Empty Dict Data
         """
         user_as_dict = Users.get_as_dict(email=self.request_data["email"])
         result = {
-            "status": self.response_status,
-            "message": self.message,
+            "status": status.HTTP_200_OK,
+            "message": "User Already Exist! User Info Is Here",
         }
 
-        if user_as_dict["data"]:
-            return result | user_as_dict
-        else:
-            return result | user_as_dict
-
+        return result | user_as_dict
 
     def get_or_create(self) -> dict:
         """
@@ -46,15 +40,11 @@ class UserService:
                 user_detail.update(
                     status=status.HTTP_201_CREATED,
                     message="User Creation Success",
-                    data=Users.get_as_dict(id=user)
+                    data=Users.get_as_dict(id=user)["data"]
                 )
                 return user_detail
             except Exception as error:
                 logger.warning(msg=error)
-
-                self.user_auth["authentication"] = False
-
-                self.message = "There Is An Error! Authorization Is Not Success. Please Try Again Letter"
 
                 user_detail.update(
                     status=status.HTTP_401_UNAUTHORIZED,

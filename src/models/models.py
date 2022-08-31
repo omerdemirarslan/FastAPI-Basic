@@ -103,3 +103,7 @@ class Users(BaseModel):
             LOGGER.warning(msg=message)
 
             return result
+        except Exception as error:
+            LOGGER.warning(msg=str(error))
+
+            return result
