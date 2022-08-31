@@ -10,72 +10,58 @@ logger = logging.getLogger(__name__)
 class UserService:
     """ User Base Helper Class """
 
-    def __init__(self):
-        self.user_auth = {"authentication": True, "authentication_token": ""}
+    def __init__(self, user_data: dict):
+        self.request_data = user_data
+        self.user_auth = {"authentication": True, "authentication_token": None}
         self.response_status = status.HTTP_200_OK
         self.message = "User Already Exist! User Info Is Here"
 
-    def get_or_create(self, user_data) -> dict:
+    def get_user_info_result(self):
+        """
+
+        """
+        user_as_dict = Users.get_as_dict(email=self.request_data["email"])
+        result = {
+            "status": self.response_status,
+            "message": self.message,
+        }
+
+        if user_as_dict["data"]:
+            return result | user_as_dict
+        else:
+            return result | user_as_dict
+
+
+    def get_or_create(self) -> dict:
         """
         This Method Get User or User Create and Return User Info Data
         :return: dict
         """
-        get_user = Users.get_as_dict(email=user_data["email"])
+        user_detail = self.get_user_info_result()
 
-        if not get_user:
+        if not user_detail["data"]:
             try:
-                user = Users.user_create(user_data=user_data)
+                user = Users.user_create(user_data=self.request_data)
 
-                self.response_status = status.HTTP_201_CREATED
-
-                get_user = Users.get_as_dict(id=user)
-                self.message = "User Creation Success"
+                user_detail.update(
+                    status=status.HTTP_201_CREATED,
+                    message="User Creation Success",
+                    data=Users.get_as_dict(id=user)
+                )
+                return user_detail
             except Exception as error:
                 logger.warning(msg=error)
 
                 self.user_auth["authentication"] = False
-                self.response_status = status.HTTP_401_UNAUTHORIZED
+
                 self.message = "There Is An Error! Authorization Is Not Success. Please Try Again Letter"
 
-                user_detail = {
-                    "status": self.response_status,
-                    "message": self.message,
-                    "data": {
-                        "There Is No Data."
-                    }
-                }
+                user_detail.update(
+                    status=status.HTTP_401_UNAUTHORIZED,
+                    message="There Is An Error! Authorization Is Not Success. Please Try Again Letter",
+                    data="There Is No Data."
+                )
 
                 return user_detail
-
-        user_detail = {
-            "status": self.response_status,
-            "message": self.message,
-            "data": {
-                "id": get_user["id"],
-                "name": get_user["name"],
-                "surname": get_user["surname"],
-                "email": get_user["email"],
-                "gender": get_user["gender"],
-                "birthday": get_user["birthday"],
-                "status": get_user["status"],
-                "test_user": get_user["test_user"],
-            }
-        }
-
-        return user_detail
-
-    def user_register(self, user_data: dict) -> dict:
-        """
-        This Method Return User Data With Authentication Information
-        :return: dict
-        """
-        user_detail = self.get_or_create(
-            user_data=user_data
-        )
-
-        if not self.user_auth["authentication"]:
-            return user_detail | self.user_auth
-
-        self.user_auth["authentication_token"] = "some key"
-
-        return user_detail | self.user_auth
+        else:
+            return user_detail

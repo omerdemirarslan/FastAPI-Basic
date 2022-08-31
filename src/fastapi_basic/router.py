@@ -37,27 +37,36 @@ async def user_register(user_post_data: Request):
         )
 
     if isinstance(user_converted_data, dict):
-        try:
-            user = UserService()
-            user_info = user.user_register(user_data=user_converted_data)
+        if user_converted_data:
+            try:
+                user = UserService(user_data=user_converted_data)
+                user_info = user.get_or_create()
 
-            return responses.JSONResponse(
-                user_info
-            )
-        except Exception as error:
-            logger.error(error)
+                return responses.JSONResponse(
+                    user_info
+                )
+            except Exception as error:
+                logger.error(error)
 
+                return responses.JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={
+                        "message": "There Is An Error: Check Your Body! Your Request Must Be Content Required Field: "
+                                   "Name, Surname, Email and Password."
+                    }
+                )
+        else:
             return responses.JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
                 content={
-                    "message": "There Is An Error."
+                    "message": "Send Data Is Not Empty!"
                 }
             )
     else:
         return responses.JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={
-                "message": "Sent Data Type Must Be JSON"
+                "message": "Sent Data Type Must Be JSON!"
             }
         )
 
