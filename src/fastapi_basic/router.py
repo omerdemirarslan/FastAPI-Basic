@@ -1,11 +1,24 @@
 import logging
 
-from src.fastapi_basic import app, Request, responses, status
+from src.fastapi_basic import (
+    app,
+    Request,
+    responses,
+    status,
+    Depends,
+    OAuth2PasswordBearer,
+)
 
 from src.users.user_service import UserService
+from src.helpers.constant_variables import (
+    HTTP_400_BAD_REQUEST_REQUIRE_FIELD_MESSAGE,
+    HTTP_405_METHOD_NOT_ALLOWED_MESSAGE,
+    HTTP_400_BAD_REQUEST_JSON_TYPE_MESSAGE,
+)
 
 
 logger = logging.getLogger(__name__)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @app.get("/")
@@ -16,7 +29,12 @@ async def home():
     return {"message": "Hello World"}
 
 
-@app.post("/api/v1/users/register", tags=["user Register"])
+@app.get("/items/")
+async def read_items(token: str = Depends(oauth2_scheme)):
+    return {"token": token}
+
+
+@app.post("/api/v1/users/register", tags=["User Register"])
 async def user_register(user_post_data: Request):
     """
     This Method Handle User Register Requests
@@ -30,10 +48,7 @@ async def user_register(user_post_data: Request):
 
         return responses.JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={
-                "message": "Sent Data Type Must Be JSON"
-            }
-
+            content={"message": HTTP_400_BAD_REQUEST_JSON_TYPE_MESSAGE},
         )
 
     if isinstance(user_converted_data, dict):
@@ -42,32 +57,70 @@ async def user_register(user_post_data: Request):
                 user = UserService(user_data=user_converted_data)
                 user_info = user.get_or_create()
 
-                return responses.JSONResponse(
-                    user_info
-                )
+                return responses.JSONResponse(user_info)
             except Exception as error:
                 logger.error(error)
 
                 return responses.JSONResponse(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     content={
-                        "message": "There Is An Error: Check Your Body! Your Request Must Be Content Required Field: "
-                                   "Name, Surname, Email and Password."
-                    }
+                        "message": HTTP_400_BAD_REQUEST_REQUIRE_FIELD_MESSAGE
+                    },
                 )
         else:
             return responses.JSONResponse(
                 status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
-                content={
-                    "message": "Send Data Is Not Empty!"
-                }
+                content={"message": HTTP_405_METHOD_NOT_ALLOWED_MESSAGE},
             )
     else:
         return responses.JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={
-                "message": "Sent Data Type Must Be JSON!"
-            }
+            content={"message": HTTP_400_BAD_REQUEST_JSON_TYPE_MESSAGE},
+        )
+
+
+@app.post("/api/v1/users/login", tags=["User Login"])
+async def user_login(user_post_data: Request):
+    """
+    This Method Handle User Login Requests
+    @param user_post_data:
+    @return:
+    """
+    try:
+        user_converted_data = await user_post_data.json()
+    except Exception as error:
+        logger.error(error)
+
+        return responses.JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": HTTP_400_BAD_REQUEST_JSON_TYPE_MESSAGE},
+        )
+
+    if isinstance(user_converted_data, dict):
+        if user_converted_data:
+            try:
+                user = UserService(user_data=user_converted_data)
+                user_info = user.user_login()
+
+                return responses.JSONResponse(user_info)
+            except Exception as error:
+                logger.error(error)
+
+                return responses.JSONResponse(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    content={
+                        "message": HTTP_400_BAD_REQUEST_REQUIRE_FIELD_MESSAGE
+                    },
+                )
+        else:
+            return responses.JSONResponse(
+                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                content={"message": HTTP_405_METHOD_NOT_ALLOWED_MESSAGE},
+            )
+    else:
+        return responses.JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"message": HTTP_400_BAD_REQUEST_JSON_TYPE_MESSAGE},
         )
 
 

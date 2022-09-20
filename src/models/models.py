@@ -4,7 +4,14 @@ import logging
 import datetime
 
 from peewee import (
-    Model, AutoField, DateTimeField, CharField, SmallIntegerField, DateField, BooleanField, DoesNotExist
+    Model,
+    AutoField,
+    DateTimeField,
+    CharField,
+    SmallIntegerField,
+    DateField,
+    BooleanField,
+    DoesNotExist,
 )
 
 from src.base.database_management import DatabaseManagement
@@ -45,7 +52,7 @@ class Users(BaseModel):
         :param update:
         :return:
         """
-        update['updated_date'] = datetime.datetime.now()
+        update["updated_date"] = datetime.datetime.now()
 
         return super(Users, cls).update(__data, **update)
 
@@ -61,7 +68,7 @@ class Users(BaseModel):
                 name=user_data["name"],
                 surname=user_data["surname"],
                 email=user_data["email"],
-                password=user_data["password"]
+                password=user_data["password"],
             )
 
             return user
@@ -80,26 +87,31 @@ class Users(BaseModel):
         result = {"data": None}
 
         try:
-            query = Users.select(
-                Users.id,
-                Users.name,
-                Users.surname,
-                Users.email,
-                Users.gender,
-                Users.birthday,
-                Users.status,
-                Users.test_user
-            ).where(
-                *[getattr(Users, key) == value for key, value in expr.items()]
-            ).dicts()
-
-            result.update(
-                data=query.get()
+            query = (
+                Users.select(
+                    Users.id,
+                    Users.name,
+                    Users.surname,
+                    Users.email,
+                    Users.gender,
+                    Users.birthday,
+                    Users.status,
+                    Users.test_user,
+                )
+                .where(
+                    *[
+                        getattr(Users, key) == value
+                        for key, value in expr.items()
+                    ]
+                )
+                .dicts()
             )
+
+            result.update(data=query.get())
+
             return result
         except DoesNotExist:
             message = "User Does Not Exist"
-
             LOGGER.warning(msg=message)
 
             return result
@@ -107,3 +119,26 @@ class Users(BaseModel):
             LOGGER.warning(msg=str(error))
 
             return result
+
+    @classmethod
+    def get_user_hashed_password(cls, email) -> dict:
+        """
+        This Method Return User Password
+        @param email:
+        @return:
+        """
+        try:
+            password = (
+                Users.select(Users.password).where(Users.email == email).dicts()
+            )
+
+            return password.get()
+        except DoesNotExist:
+            message = "User Does Not Exist"
+            LOGGER.warning(msg=message)
+
+            return {}
+        except Exception as error:
+            LOGGER.warning(msg=str(error))
+
+            return {}
