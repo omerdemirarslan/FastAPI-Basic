@@ -1,13 +1,6 @@
 import logging
 
-from src.fastapi_basic import (
-    app,
-    Request,
-    responses,
-    status,
-    Depends,
-    OAuth2PasswordBearer,
-)
+from src.fastapi_basic import app, Request, responses, status
 
 from src.users.user_service import UserService
 from src.helpers.constant_variables import (
@@ -18,7 +11,6 @@ from src.helpers.constant_variables import (
 
 
 logger = logging.getLogger(__name__)
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @app.get("/")
@@ -27,11 +19,6 @@ async def home():
     This Method Get Home Page
     """
     return {"message": "Hello World"}
-
-
-@app.get("/items/")
-async def read_items(token: str = Depends(oauth2_scheme)):
-    return {"token": token}
 
 
 @app.post("/api/v1/users/register", tags=["User Register"])
@@ -124,7 +111,7 @@ async def user_login(user_post_data: Request):
         )
 
 
-@app.patch("/api/v1/users/update", tags=["user Update"])
+@app.patch("/api/v1/users/update", tags=["User Update"])
 def user_update(user_post_data: Request):
     """
     This Method Handle User Update Requests
@@ -136,7 +123,7 @@ def user_update(user_post_data: Request):
     return user_converted_data
 
 
-@app.get("/api/v1/users/get", tags=["user Get"])
+@app.get("/api/v1/users/get", tags=["User Get"])
 def user_update(user_post_data: Request):
     """
     This Method Handle User Get Requests

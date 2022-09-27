@@ -8,7 +8,6 @@ from peewee_migrate import Router
 
 logger = logging.getLogger(__name__)
 
-
 MIGRATION_FOLDER_PATH = path.abspath(
     path.join(path.dirname(__file__), "..", "migrations")
 )
