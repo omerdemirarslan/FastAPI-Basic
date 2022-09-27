@@ -1,20 +1,18 @@
 """ User Base Helper File For All Helper Functions """
 import logging
-from typing import Any
 
+from typing import Any
 from src.fastapi_basic import (
     Union,
     datetime,
     timedelta,
     status,
-    OAuth2PasswordBearer,
     JWTError,
     jwt,
     CryptContext,
 )
 
 from src.models.models import Users
-
 from src.helpers.constant_variables import (
     HTTP_200_OK_EXIST_USER_MESSAGE,
     HTTP_200_OK_AUTHENTICATION_SUCCESS_MESSAGE,
@@ -32,9 +30,6 @@ from src.helpers.constant_variables import (
 
 logger = logging.getLogger(__name__)
 
-PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
-OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
-
 
 class UserService:
     """User Base Helper Class"""
@@ -44,6 +39,7 @@ class UserService:
         self.user_email = user_data["email"]
         self.user_password = user_data["password"]
         self.user_auth = {"authentication": True, "token": "No Token"}
+        self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     @staticmethod
     def authenticate_user(email: str) -> dict:
@@ -86,7 +82,7 @@ class UserService:
                             data=new_user_data,
                         )
 
-                        return user_detail | self.user_auth
+                        return user_detail
                     else:
                         user_detail.update(
                             status=status.HTTP_204_NO_CONTENT,
@@ -120,17 +116,15 @@ class UserService:
         else:
             return user_detail
 
-    @staticmethod
-    def create_hashed_password(password: str) -> str:
+    def create_hashed_password(self, password: str) -> str:
         """
         This Method Creates Hashed Password By Context.
         @param password: User's Password.
         @return: Hashed Password.
         """
-        return PWD_CONTEXT.hash(secret=password)
+        return self.pwd_context.hash(secret=password)
 
-    @staticmethod
-    def verify_password(requested_password: str, hashed_password: str):
+    def verify_password(self, requested_password: str, hashed_password: str):
         """
         This Method Compare Password In The Requested Data and Database User Models.
         If Both of Them Equal It Returns True
@@ -138,7 +132,7 @@ class UserService:
         @param hashed_password:
         @return:
         """
-        return PWD_CONTEXT.verify(
+        return self.pwd_context.verify(
             secret=requested_password, hash=hashed_password
         )
 

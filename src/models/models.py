@@ -1,7 +1,6 @@
 """ This File Contains Base Models For All Project """
-import logging
-
 import datetime
+import logging
 
 from peewee import (
     Model,

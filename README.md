@@ -3,17 +3,17 @@
 ---
 
 ## Requirements
-* Python = 3.9
-* PostgreSQL Database = 13
-* [Docker](https://www.docker.com/)
+* [Python3.9 Download ](https://www.python.org/downloads/)
+* [PostgreSQL 13 Database](https://www.postgresql.org/download/)
+* [Docker Website](https://www.docker.com/)
 * .env file on the project main line
 * Install Makefile plugin: **If you want to run project makefile command**
 
 
 ## Description
 
-This project is built using on the basic FastAPI microframework. Apart from these, the project is dockerized with the 
-docker application. When you download the project to your local, for you to deal with extra database 
+This project is built using on the basic FastAPI microframework. Apart from these, the project is dockerized with the
+docker application. When you download the project to your local, for you to deal with extra database
 operations; PostgreSQL database.
 
 The purpose of this project include: All FastAPI-Basic Request-Response Relationship Management.
@@ -24,7 +24,6 @@ The purpose of this project include: All FastAPI-Basic Request-Response Relation
 This project has three applications. These apps:
 * base
 * users
-* error-reporting
 
 We are use pre-commit on this project. You have to set pre-commit for before controls committed:
 * pre-commit install
@@ -64,8 +63,9 @@ $ docker-compose up
 You can add the database source in your IDE database management or other database interface.
 
 The credentials for database in the docker:
-Host: 0.0.0.0 # because project runs ıt host on your local.
-Port: 6432 # because Docker use 5432 default port in base postgresql but It need difference port local project.
+
+Host: 0.0.0.0           # because project runs ıt host on your local.
+Port: 6432              # because Docker use 5432 default port in base postgresql but It need difference port local project.
 Database: fastapi-basic
 User: fastapi
 Password: 007007
